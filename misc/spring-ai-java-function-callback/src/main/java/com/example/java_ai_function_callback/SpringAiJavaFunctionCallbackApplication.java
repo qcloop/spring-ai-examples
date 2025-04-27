@@ -5,6 +5,8 @@ import java.util.function.Function;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.model.function.FunctionCallback;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -25,7 +27,7 @@ public class SpringAiJavaFunctionCallbackApplication {
 				ChatClient chatClient = chatClientBuilder.build();
 				ChatResponse response = chatClient
 						.prompt("What are the weather conditions in San Francisco, Tokyo, and Paris? Find the temperature in Celsius for each of the three locations.")
-						.functions("WeatherInfo")
+						.tools("WeatherInfo")
 						.call().chatResponse();
 
 				System.out.println("Response: " + response);
@@ -55,9 +57,8 @@ public class SpringAiJavaFunctionCallbackApplication {
 	static class Config {
 
 		@Bean
-		public FunctionCallback weatherFunctionInfo(Function<WeatherRequest, WeatherResponse> currentWeather) {
-			return FunctionCallback.builder()
-					.function("WeatherInfo", currentWeather)
+		public ToolCallback weatherFunctionInfo(Function<WeatherRequest, WeatherResponse> currentWeather) {
+			return FunctionToolCallback.builder("WeatherInfo", currentWeather)
 					.description(
 							"Find the weather conditions, forecasts, and temperatures for a location, like a city or state."
 					)

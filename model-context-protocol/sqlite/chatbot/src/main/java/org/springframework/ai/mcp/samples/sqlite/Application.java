@@ -83,8 +83,7 @@ public class Application {
 	}
 
 	private static String getDbPath() {
-		var path = Paths.get(System.getProperty("user.home"), "Desktop", "MCP", "test.db").toString();
-		System.out.println("SQLite DB Path: " + path);
+		var path = Paths.get(System.getProperty("user.dir"),"test.db").toString();
 		return path;
 	}
 
