@@ -6,7 +6,7 @@ Follow the [MCP Client Boot Starter](https://docs.spring.io/spring-ai/reference/
 
 ## Overview
 
-The project uses Spring Boot and Spring AI to create a command-line application that demonstrates MCP server integration. The application:
+The project uses Spring Boot 3.3.6 and Spring AI 1.1.0-SNAPSHOT to create a command-line application that demonstrates MCP server integration. The application:
 - Connects to MCP servers using STDIO and/or SSE (HttpClient-based) transports
 - Integrates with Spring AI's chat capabilities
 - Demonstrates tool execution through MCP servers
@@ -19,7 +19,7 @@ For example, running the application with `-Dai.user.input="Does Spring AI suppo
 - Java 17 or later
 - Maven 3.6+
 - Anthropic API key (Claude) (Get one at https://docs.anthropic.com/en/docs/initial-setup)
-- Brave Search API key (Get one at https://brave.com/search/api/)
+- Brave Search API key (for the Brave Search MCP server) (Get one at https://brave.com/search/api/)
 
 ## Dependencies
 
@@ -54,6 +54,9 @@ spring.main.web-application-type=none
 
 # AI Provider Configuration
 spring.ai.anthropic.api-key=${ANTHROPIC_API_KEY}
+
+# Enable the MCP client tool-callback auto-configuration
+spring.ai.mcp.client.toolcallback.enabled=true
 ```
 
 #### STDIO Transport Properties
@@ -117,10 +120,12 @@ The application demonstrates a simple command-line interaction with an AI model 
 
 ## Running the Application
 
-1. Set the required environment variable:
+1. Set the required environment variables:
    ```bash
    export ANTHROPIC_API_KEY=your-api-key
-   export BRAVE_API_KEY='your-brave-api-key-here'
+   
+   # For the Brave Search MCP server
+   export BRAVE_API_KEY=your-brave-api-key
    ```
 
 2. Build the application:
@@ -130,10 +135,14 @@ The application demonstrates a simple command-line interaction with an AI model 
 
 3. Run the application:
    ```bash   
+   # Run with the default question from application.properties
+   java -jar target/mcp-starter-default-client-0.0.1-SNAPSHOT.jar
+   
+   # Or specify a custom question
    java -Dai.user.input='Does Spring AI support MCP?' -jar target/mcp-starter-default-client-0.0.1-SNAPSHOT.jar
    ```
 
-The application will execute the question "Does Spring AI support MCP?", use the provided brave (or other tools) to answer it, and display the AI assistant's response.
+The application will execute the question, use the configured MCP tools to answer it, and display the AI assistant's response.
 
 ## Additional Resources
 

@@ -1,7 +1,8 @@
 package com.example.kotlin_function_callback
 
 import org.springframework.ai.chat.client.ChatClient
-import org.springframework.ai.model.function.FunctionCallback
+import org.springframework.ai.tool.ToolCallback
+import org.springframework.ai.tool.function.FunctionToolCallback
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -18,7 +19,7 @@ class KotlinFunctionCallbackApplication {
 			val chatClient = chatClientBuilder.build();
 			val response = chatClient
 				.prompt("What are the weather conditions in San Francisco, Tokyo, and Paris? Find the temperature in Celsius for each of the three locations.")
-				.functions("WeatherInfo")
+				.toolNames("WeatherInfo")
 				.call().chatResponse();
 
 			println("Response: $response")
@@ -33,9 +34,8 @@ class KotlinFunctionCallbackApplication {
 class Config {
 
 	@Bean
-	fun weatherFunctionInfo(currentWeather: (WeatherRequest) -> WeatherResponse): FunctionCallback {
-		return FunctionCallback.builder()
-			.function("WeatherInfo", currentWeather)
+	fun weatherFunctionInfo(currentWeather: (WeatherRequest) -> WeatherResponse): ToolCallback {
+		return FunctionToolCallback.builder("WeatherInfo", currentWeather)
 			.description(
 				"Find the weather conditions, forecasts, and temperatures for a location, like a city or state."
 			)

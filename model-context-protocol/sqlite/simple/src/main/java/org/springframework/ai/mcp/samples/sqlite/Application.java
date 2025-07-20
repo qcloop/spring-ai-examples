@@ -30,7 +30,7 @@ public class Application {
 
 		return args -> {
 			var chatClient = chatClientBuilder
-					.defaultTools(new SyncMcpToolCallbackProvider(mcpClients))
+					.defaultToolCallbacks(new SyncMcpToolCallbackProvider(mcpClients))
 					.build();
 			System.out.println("Running predefined questions with AI model responses:\n");
 

@@ -41,7 +41,7 @@ public class Application {
 		return args -> {
 
 			var chatClient = chatClientBuilder
-					.defaultTools(tools)
+					.defaultToolCallbacks(tools)
 					.build();
 
 			System.out.println("\n>>> QUESTION: " + userInput);

@@ -6,20 +6,21 @@ Follow the [MCP Client Boot Starter](https://docs.spring.io/spring-ai/reference/
 
 ## Overview
 
-The project uses Spring Boot and Spring AI to create a command-line application that demonstrates MCP server integration with WebFlux. The application:
+The project uses Spring Boot 3.3.6 and Spring AI 1.1.0-SNAPSHOT to create a command-line application that demonstrates MCP server integration with WebFlux. The application:
 - Connects to MCP servers using STDIO and/or SSE (WebFlux-based) transports
 - Integrates with Spring AI's chat capabilities
 - Demonstrates tool execution through MCP servers
 - Takes a user-defined question via the `-Dai.user.input` command-line property, which is mapped to a Spring `@Value` annotation in the code
 
-For example, running the application with `-Dai.user.input="Does Spring AI support MCP?"` will inject this question into the application through Spring's property injection, and the application will use it to query the MCP server using WebFlux's reactive programming model.
+For example, running the application with `-Dai.user.input="What tools are available?"` will inject this question into the application through Spring's property injection, and the application will use it to query the MCP server using WebFlux's reactive programming model.
 
 ## Prerequisites
 
 - Java 17 or later
 - Maven 3.6+
 - Anthropic API key (Claude) (Get one at https://docs.anthropic.com/en/docs/initial-setup)
-- Brave Search API key (Get one at https://brave.com/search/api/)
+- OpenAI API key (optional, commented out by default) (Get one at https://platform.openai.com/api-keys)
+- Brave Search API key (for the Brave Search MCP server) (Get one at https://brave.com/search/api/)
 
 ## Dependencies
 
@@ -35,6 +36,11 @@ The project uses the following main dependencies:
         <groupId>org.springframework.ai</groupId>
         <artifactId>spring-ai-starter-model-anthropic</artifactId>
     </dependency>
+    <!-- OpenAI dependency is commented out by default but can be enabled -->
+    <!-- <dependency>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-openai</artifactId>
+    </dependency> -->
 </dependencies>
 ```
 
@@ -54,6 +60,10 @@ spring.main.web-application-type=none
 
 # AI Provider Configuration
 spring.ai.anthropic.api-key=${ANTHROPIC_API_KEY}
+spring.ai.openai.api-key=${OPENAI_API_KEY}
+
+# Enable the MCP client tool-callback auto-configuration
+spring.ai.mcp.client.toolcallback.enabled=true
 ```
 
 #### STDIO Transport Properties
@@ -111,16 +121,19 @@ The application demonstrates a simple command-line interaction with an AI model 
 
 1. The application starts and configures multiple MCP Clients (one for each provided STDIO or SSE connection configuration)
 2. It builds a ChatClient with the configured MCP tools
-3. Sends a predefined question (set vi the `ai.user.input` property) to the AI model
+3. Sends a predefined question (set via the `ai.user.input` property) to the AI model
 4. Displays the AI's response
 5. Automatically closes the application
 
 ## Running the Application
 
-1. Set the required environment variable:
+1. Set the required environment variables:
    ```bash
    export ANTHROPIC_API_KEY=your-api-key
-   export BRAVE_API_KEY='your-brave-api-key-here'
+   # If using OpenAI (uncomment the dependency in pom.xml first)
+   # export OPENAI_API_KEY=your-openai-api-key
+   # For the Brave Search MCP server
+   export BRAVE_API_KEY=your-brave-api-key
    ```
 
 2. Build the application:
@@ -130,10 +143,14 @@ The application demonstrates a simple command-line interaction with an AI model 
 
 3. Run the application:
    ```bash   
+   # Run with the default question from application.properties
+   java -jar target/mcp-starter-webflux-client-0.0.1-SNAPSHOT.jar
+   
+   # Or specify a custom question
    java -Dai.user.input='Does Spring AI support MCP?' -jar target/mcp-starter-webflux-client-0.0.1-SNAPSHOT.jar
    ```
 
-The application will execute the question "Does Spring AI support MCP?", use the provided brave (or other tools) to answer it, and display the AI assistant's response.
+The application will execute the question, use the configured MCP tools to answer it, and display the AI assistant's response.
 
 ## Additional Resources
 

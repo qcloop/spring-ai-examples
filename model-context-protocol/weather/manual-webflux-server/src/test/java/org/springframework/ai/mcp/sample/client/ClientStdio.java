@@ -32,7 +32,7 @@ public class ClientStdio {
 
 		var stdioParams = ServerParameters.builder("java")
 			.args("-Dtransport.mode=stdio", "-Dspring.main.web-application-type=none", "-jar",
-					"model-context-protocol/mcp-weather-server/target/mcp-weather-server-0.0.1-SNAPSHOT.jar")
+					"model-context-protocol/weather/manual-webflux-server/target/mcp-weather-server-0.0.1-SNAPSHOT.jar")
 			.build();
 
 		var transport = new StdioClientTransport(stdioParams);

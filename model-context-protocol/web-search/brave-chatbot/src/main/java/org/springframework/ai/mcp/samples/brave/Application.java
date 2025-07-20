@@ -7,10 +7,8 @@ import io.modelcontextprotocol.client.McpSyncClient;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
-import org.springframework.ai.tool.ToolCallback;
-import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -30,8 +28,8 @@ public class Application {
 
 			var chatClient = chatClientBuilder
 					.defaultSystem("You are useful assistant and can perform web searches Brave's search API to reply to your questions.")
-					.defaultTools(new SyncMcpToolCallbackProvider(mcpSyncClients))
-					.defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
+					.defaultToolCallbacks(new SyncMcpToolCallbackProvider(mcpSyncClients))
+					.defaultAdvisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
 					.build();
 
 			// Start the chat loop

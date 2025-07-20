@@ -10,6 +10,7 @@ The MCP Sampling Client:
 - Integrates with both OpenAI and Anthropic models
 - Demonstrates how to use model hints to select the appropriate LLM
 - Combines creative responses from multiple LLMs into a single result
+- Provides logging capabilities for MCP operations
 
 ## MCP Sampling Implementation
 
@@ -20,8 +21,13 @@ MCP Sampling is a powerful capability that allows an MCP server to delegate cert
 ```java
 @Bean
 McpSyncClientCustomizer samplingCustomizer(Map<String, ChatClient> chatClients) {
-    return (name, spec) -> {
-        spec.sampling(llmRequest -> {
+    return (name, mcpClientSpec) -> {
+        
+        mcpClientSpec = mcpClientSpec.loggingConsumer(logingMessage -> {            
+            System.out.println("MCP LOGGING: [" + logingMessage.level() + "] " + logingMessage.data());            
+        });
+
+        mcpClientSpec.sampling(llmRequest -> {
             var userPrompt = ((McpSchema.TextContent) llmRequest.messages().get(0).content()).text();
             String modelHint = llmRequest.modelPreferences().hints().get(0).name();
 
@@ -39,6 +45,7 @@ McpSyncClientCustomizer samplingCustomizer(Map<String, ChatClient> chatClients) 
 
             return CreateMessageResult.builder().content(new McpSchema.TextContent(response)).build();
         });
+        System.out.println("Customizing " + name);
     };
 }
 ```
@@ -61,11 +68,10 @@ public Map<String, ChatClient> chatClients(List<ChatModel> chatModels) {
 4. **Integration with Spring AI**: The client leverages Spring AI's auto-configuration to set up the necessary components:
 
 ```java
-var mcpToolProvider = new SyncMcpToolCallbackProvider(
-    mcpClientsProvider.stream().flatMap(List::stream).toList());
+var mcpToolProvider = new SyncMcpToolCallbackProvider(mcpClients);
 
 ChatClient chatClient = ChatClient.builder(openAiChatModel)
-    .defaultTools(mcpToolProvider)
+    .defaultToolCallbacks(mcpToolProvider)
     .build();
 ```
 
@@ -113,6 +119,9 @@ spring.ai.mcp.client.sse.connections.server1.url=http://localhost:8080
 # Logging configuration
 logging.level.io.modelcontextprotocol.client=WARN
 logging.level.io.modelcontextprotocol.spec=WARN
+
+#Disable MCP tool callbacks
+spring.ai.mcp.client.toolcallback.enabled=false
 ```
 
 ## How It Works
@@ -161,8 +170,8 @@ When you run the application, you'll see output similar to:
 
 ```
 > USER: What is the weather in Amsterdam right now?
-Please incorporate all creative responses from all LLM providers.
-After the other providers add a poem that synthesizes the the poems from all the other providers.
+Please incorporate all createive responses from all LLM providers.
+After the other providers add a poem that synthesizes the poems from all the other providers.
 
 > ASSISTANT: I checked the current weather in Amsterdam for you. Here are the creative responses from different AI providers:
 

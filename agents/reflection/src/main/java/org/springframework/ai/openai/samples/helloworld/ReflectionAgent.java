@@ -17,7 +17,7 @@ package org.springframework.ai.openai.samples.helloworld;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +36,7 @@ public class ReflectionAgent {
                         Your task is to Generate the best content possible for the user's request. If the user provides critique,
                         respond with a revised version of your previous attempt.
                         """)
-                .defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
                 .build();
 
         this.critiqueChatClient = ChatClient.builder(chatModel)
@@ -45,7 +45,7 @@ public class ReflectionAgent {
                         If the user content has something wrong or something to be improved, output a list of recommendations
                         and critiques. If the user content is ok and there's nothing to change, output this: <OK>
                         """)
-                .defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().build()).build())
                 .build();
     }
 

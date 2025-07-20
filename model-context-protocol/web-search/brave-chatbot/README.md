@@ -119,7 +119,7 @@ The chatbot is implemented using Spring AI's ChatClient with MCP tool integratio
 ```java
 var chatClient = chatClientBuilder
     .defaultSystem("You are a useful assistant, expert in AI and Java.")
-    .defaultTools((Object[]) mcpToolAdapter.toolCallbacks())
+    .defaultToolCallbacks((Object[]) mcpToolAdapter.toolCallbacks())
     .defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
     .build();
 ```

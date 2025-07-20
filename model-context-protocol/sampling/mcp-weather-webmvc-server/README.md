@@ -166,7 +166,7 @@ You can connect to the weather server using either STDIO or SSE transport:
 For servers using SSE transport:
 
 ```java
-var transport = new HttpClientSseClientTransport("http://localhost:8080");
+var transport = HttpClientSseClientTransport.builder("http://localhost:8080").build();
 var client = McpClient.sync(transport).build();
 ```
 

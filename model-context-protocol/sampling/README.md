@@ -140,6 +140,8 @@ McpSyncClientCustomizer samplingCustomizer(Map<String, ChatClient> chatClients) 
 }
 ```
 
+NOTE: To prevent cyclic dependencies you have to disable MCP tool callbacks auto-configuration: `spring.ai.mcp.client.toolcallback.enabled=false`
+
 ## Running the Examples
 
 ### Prerequisites

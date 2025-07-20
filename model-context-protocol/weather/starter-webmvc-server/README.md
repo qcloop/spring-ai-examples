@@ -140,7 +140,7 @@ You can connect to the weather server using either STDIO or SSE transport:
 For servers using SSE transport:
 
 ```java
-var transport = new HttpClientSseClientTransport("http://localhost:8080");
+var transport = HttpClientSseClientTransport.builder("http://localhost:8080").build();
 var client = McpClient.sync(transport).build();
 ```
 
@@ -228,6 +228,6 @@ java -Dspring.ai.mcp.client.sse.connections.weather-server.url=http://localhost:
 
 * [Spring AI Documentation](https://docs.spring.io/spring-ai/reference/)
 * [MCP Server Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-starter-docs.html)
-* [MCP Client Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-server-boot-client-docs.html)
+* [MCP Client Boot Starter](https://docs.spring.io/spring-ai/reference/api/mcp/mcp-client-boot-starter-docs.html)
 * [Model Context Protocol Specification](https://modelcontextprotocol.github.io/specification/)
 * [Spring Boot Auto-configuration](https://docs.spring.io/spring-boot/docs/current/reference/html/features.html#features.developing-auto-configuration)

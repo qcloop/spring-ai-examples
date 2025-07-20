@@ -149,7 +149,7 @@ public class Application {
             List<ToolCallback> tools, ConfigurableApplicationContext context) {
         return args -> {
             var chatClient = chatClientBuilder
-                    .defaultTools(tools)
+                    .defaultToolCallbacks(tools)
                     .build();
 
             String question = "Does Spring AI support the Model Context Protocol? Please provide some references.";
@@ -213,7 +213,7 @@ public CommandLineRunner predefinedQuestions(ChatClient.Builder chatClientBuilde
         List<ToolCallback> tools, ConfigurableApplicationContext context) {
     return args -> {
         var chatClient = chatClientBuilder
-                .defaultTools(tools)
+                .defaultToolCallbacks(tools)
                 .build();
 
         String question = "Does Spring AI support the Model Context Protocol? "

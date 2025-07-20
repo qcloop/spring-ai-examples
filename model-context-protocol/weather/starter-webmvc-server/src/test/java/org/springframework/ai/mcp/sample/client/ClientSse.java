@@ -24,7 +24,7 @@ import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 public class ClientSse {
 
 	public static void main(String[] args) {
-		var transport = new HttpClientSseClientTransport("http://localhost:8080");
+		var transport = HttpClientSseClientTransport.builder("http://localhost:8080").build();
 		new SampleClient(transport).run();
 	}
 

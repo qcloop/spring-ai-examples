@@ -4,7 +4,6 @@ import java.util.function.Function;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.boot.CommandLineRunner;
@@ -27,10 +26,12 @@ public class SpringAiJavaFunctionCallbackApplication {
 				ChatClient chatClient = chatClientBuilder.build();
 				ChatResponse response = chatClient
 						.prompt("What are the weather conditions in San Francisco, Tokyo, and Paris? Find the temperature in Celsius for each of the three locations.")
-						.tools("WeatherInfo")
+						.toolNames("WeatherInfo")
 						.call().chatResponse();
 
 				System.out.println("Response: " + response);
+				System.out.println("Exiting successfully");
+				System.exit(0);
 			}
 			catch (Exception e) {
 				System.out.println("Error during weather check: " + e.getMessage());

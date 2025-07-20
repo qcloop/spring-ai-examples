@@ -18,7 +18,6 @@ package org.springframework.ai.mcp.sample.server;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CreateMessageResult;
 import io.modelcontextprotocol.spec.McpSchema.LoggingLevel;

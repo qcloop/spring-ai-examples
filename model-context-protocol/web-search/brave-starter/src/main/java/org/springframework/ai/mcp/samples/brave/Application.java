@@ -41,7 +41,7 @@ public class Application {
 		return args -> {
 
 			var chatClient = chatClientBuilder
-					.defaultTools(new SyncMcpToolCallbackProvider(mcpSyncClients))
+					.defaultToolCallbacks(new SyncMcpToolCallbackProvider(mcpSyncClients))
 					.build();
 
 			String question = "Does Spring AI support the Model Context Protocol? Please provide some references.";

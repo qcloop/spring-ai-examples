@@ -1,12 +1,11 @@
 package org.springframework.ai.openai.samples.helloworld;
 
-import org.springframework.ai.chat.client.ChatClient;
+import java.util.Scanner;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-
-import java.util.Scanner;
 
 @SpringBootApplication
 public class Application {
