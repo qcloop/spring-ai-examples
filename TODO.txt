@@ -1,0 +1,31 @@
+# Integration Testing Framework TODO
+
+## High Priority
+- [x] Fix parallel execution port conflicts (changed default to sequential)
+- [ ] Implement real-time test output streaming for long-running tests
+- [ ] Add progress indicators showing test execution status
+- [x] Move integration testing docs to root level (README_INTEGRATION_TESTING.md)
+
+## Medium Priority  
+- [ ] Investigate future parallel execution approaches:
+  - Dynamic port assignment (server.port=0)
+  - Test categorization (web apps vs CommandLineRunner apps)
+  - Port pool management
+- [ ] Add timeout progress bars for long tests
+- [ ] Implement test output tailing/streaming
+
+## Low Priority
+- [ ] Create test execution dashboard
+- [ ] Add performance profiling for slow tests
+- [ ] Implement test result caching
+
+## Current Issues
+- prompt-engineering-patterns takes very long to run (~2+ minutes)
+- Some tests are web apps that conflict on port 8080
+- No visibility into test progress during execution
+
+## Ideas for Real-time Output
+1. **Streaming mode**: `--stream` flag to show live output
+2. **Progress indicators**: Show dots/spinner during execution  
+3. **Timeout warnings**: Alert when tests approach timeout
+4. **Live log tailing**: `tail -f` style output for active tests

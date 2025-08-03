@@ -28,10 +28,11 @@ For more information, see the [MCP Server Boot Starter](https://docs.spring.io/s
 ## Overview
 
 The sample showcases a comprehensive MCP server implementation with:
-- Integration with `spring-ai-mcp-server-webmvc-spring-boot-starter`
+- Integration with `spring-ai-starter-mcp-server-webmvc`
 - Support for both SSE (Server-Sent Events) and STDIO transports
 - Automatic registration of MCP capabilities using annotations:
-  - `@Tool` for tool registration
+  - `@Tool` for Spring AI tool registration
+  - `@McpTool` for MCP-specific tool registration
   - `@McpResource` for resource registration
   - `@McpPrompt` for prompt registration
   - `@McpComplete` for completion registration
@@ -41,8 +42,8 @@ The sample showcases a comprehensive MCP server implementation with:
 
 This sample demonstrates:
 
-1. **Weather Tools** - Tools for retrieving weather forecasts and alerts
-2. **User Profile Resources** - Resources for accessing user profile information
+1. **Weather Tools** - Tools for retrieving weather forecasts and alerts using both Spring AI `@Tool` and MCP `@McpTool` annotations
+2. **User Profile Resources** - Resources for accessing user profile information with various URI patterns
 3. **Prompt Generation** - Various prompt templates for different use cases
 4. **Auto-completion** - Completion suggestions for usernames and countries
 
@@ -52,12 +53,13 @@ The project requires the Spring AI MCP Server WebMVC Boot Starter and MCP Annota
 
 ```xml
 <dependency>
-    <groupId>org.springframework.ai</groupId>
-    <artifactId>spring-ai-mcp-server-webmvc-spring-boot-starter</artifactId>
+    <groupId>org.springaicommunity</groupId>
+    <artifactId>spring-ai-mcp-annotations</artifactId>
+    <version>0.2.0-SNAPSHOT</version>
 </dependency>
 <dependency>
-    <groupId>com.logaritex.mcp</groupId>
-    <artifactId>spring-ai-mcp-annotations</artifactId>
+    <groupId>org.springframework.ai</groupId>
+    <artifactId>spring-ai-starter-mcp-server-webmvc</artifactId>
 </dependency>
 ```
 
@@ -98,13 +100,16 @@ Configure the server through `application.properties`:
 spring.ai.mcp.server.name=my-weather-server
 spring.ai.mcp.server.version=0.0.1
 
-# Transport configuration
-spring.ai.mcp.server.stdio=false
-spring.ai.mcp.server.sse-message-endpoint=/mcp/message
+# Transport configuration (uncomment to enable STDIO)
+# spring.ai.mcp.server.stdio=true
+# spring.main.web-application-type=none
 
 # Logging (required for STDIO transport)
 spring.main.banner-mode=off
-logging.file.name=./target/mcp-annotations-server.log
+# logging.pattern.console=
+
+# Log file location
+logging.file.name=./model-context-protocol/weather/starter-webmvc-server/target/starter-webmvc-server.log
 ```
 
 ## Server Implementation
@@ -119,23 +124,28 @@ public class McpServerApplication {
     }
 
     @Bean
-    public ToolCallbackProvider weatherTools(WeatherService weatherService) {
+    public ToolCallbackProvider weatherTools(SpringAiToolProvider weatherService) {
         return MethodToolCallbackProvider.builder().toolObjects(weatherService).build();
     }
 
     @Bean
     public List<SyncResourceSpecification> resourceSpecs(UserProfileResourceProvider userProfileResourceProvider) {
-        return SpringAiMcpAnnotationProvider.createSyncResourceSpecifications(List.of(userProfileResourceProvider));
+        return SyncMcpAnnotationProvider.createSyncResourceSpecifications(List.of(userProfileResourceProvider));
     }
 
     @Bean
     public List<SyncPromptSpecification> promptSpecs(PromptProvider promptProvider) {
-        return SpringAiMcpAnnotationProvider.createSyncPromptSpecifications(List.of(promptProvider));
+        return SyncMcpAnnotationProvider.createSyncPromptSpecifications(List.of(promptProvider));
     }
 
     @Bean
     public List<SyncCompletionSpecification> completionSpecs(AutocompleteProvider autocompleteProvider) {
-        return SpringAiMcpAnnotationProvider.createSyncCompleteSpecifications(List.of(autocompleteProvider));
+        return SyncMcpAnnotationProvider.createSyncCompleteSpecifications(List.of(autocompleteProvider));
+    }
+
+    @Bean
+    public List<SyncToolSpecification> toolSpecs(McpToolProvider toolProvider) {
+        return SyncMcpAnnotationProvider.createSyncToolSpecifications(List.of(toolProvider));
     }
 }
 ```
@@ -144,11 +154,15 @@ public class McpServerApplication {
 
 ### Tools
 
-The `WeatherService` implements weather-related tools using the `@Tool` annotation:
+The project includes two different tool providers demonstrating different annotation approaches:
+
+#### SpringAiToolProvider (Spring AI @Tool annotation)
+
+Uses Spring AI's `@Tool` annotation for weather-related tools:
 
 ```java
 @Service
-public class WeatherService {
+public class SpringAiToolProvider {
     @Tool(description = "Get weather forecast for a specific latitude/longitude")
     public String getWeatherForecastByLocation(double latitude, double longitude) {
         // Implementation using weather.gov API
@@ -161,24 +175,49 @@ public class WeatherService {
 }
 ```
 
+#### McpToolProvider (MCP @McpTool annotation)
+
+Uses MCP-specific `@McpTool` annotation for temperature retrieval:
+
+```java
+@Service
+public class McpToolProvider {
+    @McpTool(description = "Get the temperature (in celsius) for a specific location")
+    public WeatherResponse getTemperature(
+            @McpToolParam(description = "The location latitude") double latitude,
+            @McpToolParam(description = "The location longitude") double longitude,
+            @McpToolParam(description = "The city name") String city) {
+        // Implementation using open-meteo.com API
+    }
+}
+```
+
 #### Available Tools
 
-1. **Weather Forecast Tool**
+1. **Weather Forecast Tool** (Spring AI)
    - Name: `getWeatherForecastByLocation`
    - Description: Get weather forecast for a specific latitude/longitude
    - Parameters:
      - `latitude`: double - Latitude coordinate
      - `longitude`: double - Longitude coordinate
 
-2. **Weather Alerts Tool**
+2. **Weather Alerts Tool** (Spring AI)
    - Name: `getAlerts`
    - Description: Get weather alerts for a US state
    - Parameters:
      - `state`: String - Two-letter US state code (e.g., CA, NY)
 
+3. **Temperature Tool** (MCP)
+   - Name: `getTemperature`
+   - Description: Get the temperature (in celsius) for a specific location
+   - Parameters:
+     - `latitude`: double - The location latitude
+     - `longitude`: double - The location longitude
+     - `city`: String - The city name
+
 ### Resources
 
-The `UserProfileResourceProvider` implements resource access using the `@McpResource` annotation:
+The `UserProfileResourceProvider` implements resource access using the `@McpResource` annotation with comprehensive examples:
 
 ```java
 @Service
@@ -231,6 +270,11 @@ public class UserProfileResourceProvider {
 9. **User Avatar**
    - URI: `user-avatar://{username}`
    - Description: Provides a base64-encoded avatar image for a user
+   - MIME Type: `image/png`
+
+#### Sample User Data
+
+The provider includes sample data for users: `john`, `jane`, `bob`, and `alice` with profiles containing name, email, age, and location information.
 
 ### Prompts
 
@@ -255,7 +299,7 @@ public class PromptProvider {
    - Name: `greeting`
    - Description: A simple greeting prompt
    - Parameters:
-     - `name`: String - The name to greet
+     - `name`: String - The name to greet (required)
 
 2. **Personalized Message**
    - Name: `personalized-message`
@@ -305,15 +349,16 @@ public class AutocompleteProvider {
 
 1. **Username Completion**
    - URI: `user-status://{username}`
-   - Provides completion suggestions for usernames
+   - Provides completion suggestions for usernames based on prefix
 
 2. **Name Completion**
    - Prompt: `personalized-message`
-   - Provides completion suggestions for names
+   - Provides completion suggestions for names in personalized message prompts
 
 3. **Country Name Completion**
    - Prompt: `travel-planner`
    - Provides completion suggestions for country names
+   - Returns: `CompleteResult` with completion details
 
 ## MCP Clients 
 

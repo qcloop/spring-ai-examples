@@ -1,0 +1,11 @@
+{
+  "timeoutSec": 120,
+  "successRegex": [
+    "Joke:",
+    "Setup:",
+    "Punchline:"
+  ],
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ]
+}

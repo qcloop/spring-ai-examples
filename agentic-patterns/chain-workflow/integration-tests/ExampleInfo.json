@@ -1,0 +1,15 @@
+{
+  "timeoutSec": 300,
+  "successRegex": [
+    "Customer Satisfaction",
+    "Employee Satisfaction", 
+    "Product Adoption Rate",
+    "Revenue Growth",
+    "Operating Margin",
+    "Market Share",
+    "Customer Churn"
+  ],
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ]
+}

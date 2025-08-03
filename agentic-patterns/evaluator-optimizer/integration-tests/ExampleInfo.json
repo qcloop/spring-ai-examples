@@ -1,0 +1,12 @@
+{
+  "timeoutSec": 600,
+  "successRegex": [
+    "=== GENERATOR OUTPUT ===",
+    "=== EVALUATOR OUTPUT ===",
+    "EVALUATION: PASS",
+    "FINAL OUTPUT:"
+  ],
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ]
+}

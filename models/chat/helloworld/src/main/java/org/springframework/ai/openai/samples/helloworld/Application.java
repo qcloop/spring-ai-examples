@@ -4,9 +4,8 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-
-import java.util.Scanner;
 
 @SpringBootApplication
 public class Application {
@@ -16,16 +15,15 @@ public class Application {
     }
 
     @Bean
-    CommandLineRunner cli(ChatClient.Builder builder) {
+    CommandLineRunner cli(ChatClient.Builder builder, ConfigurableApplicationContext context) {
         return args -> {
             var chat = builder.build();
-            var scanner = new Scanner(System.in);
-            System.out.println("\nLet's chat!");
-            while (true) {
-                System.out.print("\nUSER: ");
-                System.out.println("ASSISTANT: " +
-                        chat.prompt(scanner.nextLine()).call().content());
-            }
+            System.out.println("\nSpring AI Hello World!");
+            System.out.println("USER: Tell me a joke");
+            System.out.println("ASSISTANT: " + 
+                    chat.prompt("Tell me a joke").call().content());
+            System.out.println("\nHello World demo completed!");
+            context.close();
         };
     }
 }

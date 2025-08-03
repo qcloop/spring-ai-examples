@@ -1,0 +1,11 @@
+{
+  "timeoutSec": 180,
+  "successRegex": [
+    "data.*metadata.*id.*chatcmpl",
+    "finishReason.*STOP",
+    "text.*[a-zA-Z]{3,}"
+  ],
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ]
+}

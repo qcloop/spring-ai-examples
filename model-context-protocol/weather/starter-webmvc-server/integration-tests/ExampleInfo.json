@@ -1,0 +1,11 @@
+{
+  "timeoutSec": 300,
+  "successRegex": [
+    "BUILD SUCCESS",
+    "Started.*Application",
+    "EVALUATION:\\\\s+PASS"
+  ],
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ]
+}

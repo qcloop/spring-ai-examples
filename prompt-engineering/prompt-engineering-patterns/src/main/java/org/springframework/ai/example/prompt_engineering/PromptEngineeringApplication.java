@@ -8,6 +8,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -23,64 +24,115 @@ public class PromptEngineeringApplication {
 	}
 
 	@Bean
-	public CommandLineRunner commandLineRunner(ChatClient.Builder chatClientBuilder) {
+	public CommandLineRunner commandLineRunner(ChatClient.Builder chatClientBuilder, ConfigurableApplicationContext context) {
 		return args -> {
+			try {
+				ChatClient chatClient = chatClientBuilder.build();
 
-			ChatClient chatClient = chatClientBuilder.build();
-
-			//@formatter:off
-			// 2. Prompting techniques (page 13)
-
-				// 2.1 General prompting / zero shot (page 15)
-				pt_zero_shot(chatClient);
-
-				// 2.2 One-shot & few-shot
-				pt_ones_shot_few_shots(chatClient);
-
-				// 2.3 System, contextual and role prompting
-
-					// 2.3.1 System prompting
-					pt_system_prompting_1(chatClient);
-					pt_system_prompting_2(chatClient);
-					pt_system_prompting_2_springai_style(chatClient);
-
-					// 2.3.2 Role prompting
-					pt_role_prompting_1(chatClient);
-					pt_role_prompting_2(chatClient); // in a humorous style.
-
-					// 2.3.3 Contextual prompting
-					pt_contextual_prompting(chatClient);
-
-				// 2.4 Step-back prompting
-				pt_step_back_prompting(chatClient.mutate());
-
-				// 2.5 Chain of Thought (CoT)
-				pt_chain_of_thought_zero_shot(chatClient);
-				pt_chain_of_thought_singleshot_fewshots(chatClient);
-
-				// 2.6 Self-consistency
-				pt_self_consistency(chatClient);
-
-				// 2.7 Tree of Thoughts (ToT)
-				pt_tree_of_thoughts_game(chatClient);
-				pt_tree_of_thoughts_problem(chatClient);
-
-
-				// 2.8 Automatic Prompt Engineering
-				pt_automatic_prompt_engineering(chatClient);
-
-				// 2.9 Code prompting
-
-					// 2.9.1 Prompts for writing code
-					pt_code_prompting_writing_code(chatClient);
-
-					// 2.9.2 Prompts for explaining code
-					pt_code_prompting_explaining_code(chatClient);
-
-					// 2.9.3 Prompts for translating code
-					pt_code_prompting_translating_code(chatClient);
-			//@formatter:on
+				// Check if specific pattern is requested via command line argument
+				String pattern = args.length > 0 ? args[0] : "all";
+				
+				switch (pattern.toLowerCase()) {
+					case "basic":
+						runBasicPatterns(chatClient);
+						break;
+					case "system":
+						runSystemPatterns(chatClient);
+						break;
+					case "advanced":
+						runAdvancedPatterns(chatClient);
+						break;
+					case "all":
+					default:
+						runAllPatterns(chatClient);
+						break;
+				}
+				
+				System.out.println("Prompt engineering patterns demonstration completed!");
+				context.close();
+			} catch (Exception e) {
+				System.err.println("Error during prompt engineering execution: " + e.getMessage());
+				e.printStackTrace();
+				context.close();
+			}
 		};
+	}
+
+	private void runBasicPatterns(ChatClient chatClient) throws JsonProcessingException {
+		System.out.println("=== Running Basic Patterns ===");
+		// 2.1 General prompting / zero shot
+		pt_zero_shot(chatClient);
+		// 2.2 One-shot & few-shot
+		pt_ones_shot_few_shots(chatClient);
+	}
+
+	private void runSystemPatterns(ChatClient chatClient) throws JsonProcessingException {
+		System.out.println("=== Running System/Role Patterns ===");
+		// 2.3.1 System prompting
+		pt_system_prompting_1(chatClient);
+		pt_system_prompting_2_springai_style(chatClient);
+		// 2.3.2 Role prompting
+		pt_role_prompting_1(chatClient);
+	}
+
+	private void runAdvancedPatterns(ChatClient chatClient) throws JsonProcessingException {
+		System.out.println("=== Running Advanced Patterns ===");
+		// 2.6 Self-consistency (simplified - just one iteration)
+		pt_self_consistency_simple(chatClient);
+	}
+
+	private void runAllPatterns(ChatClient chatClient) throws JsonProcessingException {
+		//@formatter:off
+		// 2. Prompting techniques (page 13)
+
+			// 2.1 General prompting / zero shot (page 15)
+			pt_zero_shot(chatClient);
+
+			// 2.2 One-shot & few-shot
+			pt_ones_shot_few_shots(chatClient);
+
+			// 2.3 System, contextual and role prompting
+
+				// 2.3.1 System prompting
+				pt_system_prompting_1(chatClient);
+				pt_system_prompting_2(chatClient);
+				pt_system_prompting_2_springai_style(chatClient);
+
+				// 2.3.2 Role prompting
+				pt_role_prompting_1(chatClient);
+				pt_role_prompting_2(chatClient); // in a humorous style.
+
+				// 2.3.3 Contextual prompting
+				pt_contextual_prompting(chatClient);
+
+			// 2.4 Step-back prompting
+			pt_step_back_prompting(chatClient.mutate());
+
+			// 2.5 Chain of Thought (CoT)
+			pt_chain_of_thought_zero_shot(chatClient);
+			pt_chain_of_thought_singleshot_fewshots(chatClient);
+
+			// 2.6 Self-consistency
+			pt_self_consistency(chatClient);
+
+			// 2.7 Tree of Thoughts (ToT)
+			pt_tree_of_thoughts_game(chatClient);
+			pt_tree_of_thoughts_problem(chatClient);
+
+			// 2.8 Automatic Prompt Engineering
+			pt_automatic_prompt_engineering(chatClient);
+
+			// 2.9 Code prompting
+
+				// 2.9.1 Prompts for writing code
+				pt_code_prompting_writing_code(chatClient);
+
+				// 2.9.2 Prompts for explaining code
+				pt_code_prompting_explaining_code(chatClient);
+
+				// 2.9.3 Prompts for translating code
+				pt_code_prompting_translating_code(chatClient);
+		//@formatter:on
 	}
 
 	// 2.1 General prompting / zero shot (page 15)
@@ -472,7 +524,55 @@ public class PromptEngineeringApplication {
 
 	}
 
-	// 2.6 Self-consistency
+	// 2.6 Self-consistency (simplified for basic testing)
+	public void pt_self_consistency_simple(ChatClient chatClient) {
+		String email = """
+				Hi,
+				I have seen you use Wordpress for your website. A great open
+				source content management system. I have used it in the past
+				too. It comes with lots of great user plugins. And it's pretty
+				easy to set up.
+				I did notice a bug in the contact form, which happens when
+				you select the name field. See the attached screenshot of me
+				entering text in the name field. Notice the JavaScript alert
+				box that I inv0k3d.
+				But for the rest it's a great website. I enjoy reading it. Feel
+				free to leave the bug in the website, because it gives me more
+				interesting things to read.
+				Cheers,
+				Harry the Hacker.
+				""";
+
+		record EmailClassification(Classification classification, String reasoning) {
+			enum Classification {
+				IMPORTANT, NOT_IMPORTANT
+			}
+		}
+
+		// Simplified version - only one classification for basic testing
+		EmailClassification output = chatClient
+				.prompt()
+				.user(u -> u.text("""
+						Email: {email}
+						Classify the above email as IMPORTANT or NOT IMPORTANT. Let's
+						think step by step and explain why.
+						""")
+						.param("email", email))
+				.options(ChatOptions.builder()
+						.model("claude-3-5-haiku-latest")
+						.temperature(1.0)
+						.topK(60)
+						.topP(0.9)
+						.maxTokens(1024)
+						.build())
+				.call()
+				.entity(EmailClassification.class);
+
+		System.out.println("Classification: [" + output.classification() + "], Reason: " + output.reasoning());
+		System.out.println("The email is " + output.classification() + ".");
+	}
+
+	// 2.6 Self-consistency (full version)
 	public void pt_self_consistency(ChatClient chatClient) {
 
 		String email = """

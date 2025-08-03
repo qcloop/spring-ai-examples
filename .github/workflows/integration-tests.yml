@@ -1,0 +1,132 @@
+name: Spring AI Examples Integration Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  unit-tests:
+    name: Unit & Simple Tests
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Run unit tests
+        run: ./mvnw -q test --batch-mode
+
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Install JBang
+        run: |
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          echo "$HOME/.jbang/bin" >> $GITHUB_PATH
+
+      - name: Verify JBang installation
+        run: |
+          jbang version
+          java -version
+
+      - name: Install Python dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+
+      - name: Install additional dependencies
+        run: |
+          # Install uvx for MCP examples
+          python3 -m pip install uv
+          # Install other potential dependencies
+          sudo apt-get update
+          sudo apt-get install -y sqlite3
+
+      - name: Run integration tests
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          BRAVE_API_KEY: ${{ secrets.BRAVE_API_KEY }}
+        run: |
+          python3 scripts/run_integration_tests.py --verbose --report integration-test-report.md
+
+      - name: Upload test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-report
+          path: integration-test-report.md
+          retention-days: 7
+
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-logs
+          path: |
+            **/integration-tests/*.log
+            **/target/spring-boot-run.log
+          retention-days: 3
+
+  cross-platform:
+    name: Cross-Platform Tests
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, windows-2022, macos-13]
+        java: [17, 21]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+
+      - name: Install JBang (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          curl -Ls https://sh.jbang.dev | bash -s - app setup
+          echo "$HOME/.jbang/bin" >> $GITHUB_PATH
+
+      - name: Install JBang (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install jbang
+
+      - name: Verify JBang installation
+        run: |
+          jbang version
+
+      - name: Run sample integration test
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Run just one simple integration test for cross-platform verification
+          # This will be updated once we have actual integration tests
+          echo "Cross-platform test placeholder - will run actual tests once available"

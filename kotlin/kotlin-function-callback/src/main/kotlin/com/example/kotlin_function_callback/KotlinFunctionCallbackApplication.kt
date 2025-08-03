@@ -6,6 +6,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
+import org.springframework.context.ConfigurableApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Description
@@ -14,7 +15,7 @@ import org.springframework.context.annotation.Description
 class KotlinFunctionCallbackApplication {
 
 	@Bean
-	fun init(chatClientBuilder: ChatClient.Builder) = CommandLineRunner {
+	fun init(chatClientBuilder: ChatClient.Builder, context: ConfigurableApplicationContext) = CommandLineRunner {
 		try {
 			val chatClient = chatClientBuilder.build();
 			val response = chatClient
@@ -23,9 +24,12 @@ class KotlinFunctionCallbackApplication {
 				.call().chatResponse();
 
 			println("Response: $response")
+			println("Exiting successfully")
+			context.close()
 		} catch (e: Exception) {
 			println("Error during weather check: ${e.message}")
 			e.printStackTrace()
+			context.close()
 		}
 	}
 }

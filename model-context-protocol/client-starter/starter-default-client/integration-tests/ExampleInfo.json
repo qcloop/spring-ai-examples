@@ -1,0 +1,11 @@
+{
+  "timeoutSec": 300,
+  "successRegex": [
+    ">>> QUESTION: What tools are available\\?",
+    ">>> ASSISTANT:",
+    "Brave.*Search"
+  ],
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ]
+}
