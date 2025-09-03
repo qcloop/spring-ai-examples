@@ -64,3 +64,6 @@ logs/
 *.log
 test-report.md
 integration-results.md
+model-context-protocol/.DS_Store
+model-context-protocol/sqlite/.DS_Store
+model-context-protocol/sqlite/chatbot/.DS_Store
