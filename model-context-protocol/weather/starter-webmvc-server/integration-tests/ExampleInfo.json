@@ -7,5 +7,17 @@
   ],
   "requiredEnv": [
     "OPENAI_API_KEY"
-  ]
+  ],
+  "aiValidation": {
+    "enabled": true,
+    "validationMode": "hybrid",
+    "readmeFile": "../README.md",
+    "expectedBehavior": "MCP weather server should start successfully and handle client requests for weather information via getWeatherForecastByLocation and getAlerts tools. The client should successfully connect, make weather queries, and receive coherent weather data responses.",
+    "promptTemplate": "client_server_validation",
+    "components": ["server", "client"],
+    "successCriteria": {
+      "requiresUserInteraction": false,
+      "expectedOutputTypes": ["api_response", "weather_data"]
+    }
+  }
 }

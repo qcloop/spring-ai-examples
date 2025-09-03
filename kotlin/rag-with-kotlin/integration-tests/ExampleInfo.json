@@ -1,0 +1,22 @@
+{
+  "timeoutSec": 300,
+  "successRegex": [
+    "BUILD SUCCESS",
+    "Started.*Application",
+    "EVALUATION:\\\\s+PASS"
+  ],
+  "requiredEnv": [
+    "OPENAI_API_KEY"
+  ],
+  "aiValidation": {
+    "enabled": true,
+    "validationMode": "primary",
+    "readmeFile": "../README.md",
+    "expectedBehavior": "Complex AI workflow should execute successfully with multi-step processing and produce evaluation results",
+    "promptTemplate": "workflow_validation",
+    "successCriteria": {
+      "expectedSteps": 3,
+      "evaluationRequired": true
+    }
+  }
+}
